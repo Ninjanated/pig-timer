@@ -1,7 +1,6 @@
 const display = document.querySelector('.display');
-const startBtn = document.getElementById('startBtn');
+const startPauseBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
-const pauseBtn = document.getElementById('pauseBtn');
 const addFiveBtn = document.getElementById('addFiveBtn');
 const resetBtn = document.getElementById('resetBtn');
 const minutesInput = document.getElementById('minutesInput');
@@ -10,7 +9,6 @@ const secondsInput = document.getElementById('secondsInput');
 let timeLeft = 25 * 60; // 25 minutes in seconds
 let timerId = null;
 let isRunning = false;
-let isPaused = false;
 
 function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
@@ -38,15 +36,13 @@ function resetToDefault() {
 
 function startTimer() {
     if (!isRunning) {
-        // If not paused, get time from inputs
-        if (!isPaused) {
+        // If timer wasn't running, get time from inputs
+        if (!timerId) {
             timeLeft = getTimeFromInputs();
         }
         
         isRunning = true;
-        isPaused = false;
-        startBtn.disabled = true;
-        pauseBtn.disabled = false;
+        startPauseBtn.textContent = 'Pause';
         stopBtn.disabled = false;
         minutesInput.disabled = true;
         secondsInput.disabled = true;
@@ -62,6 +58,8 @@ function startTimer() {
                 updateDisplay();
             }
         }, 1000);
+    } else {
+        pauseTimer();
     }
 }
 
@@ -69,23 +67,18 @@ function pauseTimer() {
     if (isRunning) {
         clearInterval(timerId);
         isRunning = false;
-        isPaused = true;
-        startBtn.disabled = false;
-        pauseBtn.disabled = true;
-        startBtn.textContent = 'Resume';
+        startPauseBtn.textContent = 'Start';
     }
 }
 
 function stopTimer() {
     clearInterval(timerId);
     isRunning = false;
-    isPaused = false;
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
+    timerId = null;
+    startPauseBtn.textContent = 'Start';
     stopBtn.disabled = true;
     minutesInput.disabled = false;
     secondsInput.disabled = false;
-    startBtn.textContent = 'Start';
     timeLeft = getTimeFromInputs();
     updateDisplay();
 }
@@ -100,9 +93,8 @@ function addFiveMinutes() {
 }
 
 // Event Listeners
-startBtn.addEventListener('click', startTimer);
+startPauseBtn.addEventListener('click', startTimer);
 stopBtn.addEventListener('click', stopTimer);
-pauseBtn.addEventListener('click', pauseTimer);
 addFiveBtn.addEventListener('click', addFiveMinutes);
 resetBtn.addEventListener('click', resetToDefault);
 
