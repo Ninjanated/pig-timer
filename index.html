@@ -5,50 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Timer</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
-    <!-- Decorative pigs -->
-    <div class="pig-decoration">
-        <div class="ear-left"></div>
-        <div class="ear-right"></div>
-        <div class="cheek-left"></div>
-        <div class="cheek-right"></div>
-    </div>
-    <div class="pig-decoration">
-        <div class="ear-left"></div>
-        <div class="ear-right"></div>
-        <div class="cheek-left"></div>
-        <div class="cheek-right"></div>
-    </div>
-    <div class="pig-decoration">
-        <div class="ear-left"></div>
-        <div class="ear-right"></div>
-        <div class="cheek-left"></div>
-        <div class="cheek-right"></div>
-    </div>
-    <div class="pig-decoration">
-        <div class="ear-left"></div>
-        <div class="ear-right"></div>
-        <div class="cheek-left"></div>
-        <div class="cheek-right"></div>
-    </div>
-    
     <div class="timer-container">
+        <div class="paused-indicator">Timer Paused</div>
         <div class="mode-indicator">Focus Time</div>
-        <div class="time-input">
-            <div class="input-group">
-                <input type="number" id="minutesInput" min="0" max="59" value="25">
-                <span>:</span>
-                <input type="number" id="secondsInput" min="0" max="59" value="00">
+        <button id="settingsBtn" class="settings-button">
+            <span class="material-icons">settings</span>
+        </button>
+        <div class="display">25:00</div>
+        <div class="quick-adjust-container">
+            <div class="quick-adjust-label">Quick Adjust</div>
+            <div class="buttons">
+                <button id="removeTenBtn">-10s</button>
+                <button id="removeThirtyBtn">-30s</button>
+                <button id="addTenBtn">+10s</button>
+                <button id="addThirtyBtn">+30s</button>
             </div>
         </div>
-        <div class="display">25:00</div>
         <div class="buttons">
-            <button id="startBtn">Start</button>
-            <button id="stopBtn" disabled>Stop</button>
+            <button id="startPauseBtn">Start</button>
             <button id="resetBtn">Reset</button>
         </div>
     </div>
+
+    <!-- Settings Popup -->
+    <div class="popup" id="settingsPopup">
+        <div class="popup-content">
+            <h2>Timer Settings</h2>
+            <div class="duration-label">Duration (minutes)</div>
+            <div class="time-input">
+                <div class="input-group">
+                    <input type="number" id="minutesInput" min="0" max="59" value="25">
+                    <span>:</span>
+                    <input type="number" id="secondsInput" min="0" max="59" value="00">
+                </div>
+            </div>
+            <button id="settingsCloseBtn">Save</button>
+        </div>
+    </div>
+
+    <!-- Time's Up Popup -->
+    <div class="popup" id="timeUpPopup">
+        <div class="popup-content">
+            <h2>Time's Up!</h2>
+            <p id="popupMessage"></p>
+            <button id="popupCloseBtn">OK</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div class="confirmation-dialog" id="confirmationDialog">
+        <div class="confirmation-content">
+            <h2>Timer is Running</h2>
+            <p>Changing settings will pause the timer. Do you want to continue?</p>
+            <div class="confirmation-buttons">
+                <button id="confirmSettingsBtn">Yes, Change Settings</button>
+                <button id="cancelSettingsBtn">No, Keep Running</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
