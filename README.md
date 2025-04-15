@@ -1,48 +1,42 @@
-# Focus Timer
+# C2C Focus Timer
 
-A beautiful and functional focus timer application with a modern UI and cute pig decorations. Perfect for Pomodoro technique and general time management.
+A focus timer application designed for the C2C program, featuring a clean interface and productivity-enhancing features.
 
 ## Features
 
-- Clean, modern UI with glassmorphism design
-- Customizable work and rest durations
-- Quick time adjustment buttons
-- Cute animated pig decorations
+- Clean, modern UI
+- Customizable timer durations
+- Work and rest period management
 - Sound notifications
-- Settings popup for easy configuration
-- Responsive design
+- Quick time adjustment
+- Settings configuration
 
 ## Setup
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/focus-timer.git
-cd focus-timer
+git clone https://github.com/Ninjanated/c2c-focustimer.git
+cd c2c-focustimer
 ```
 
 2. Open the project:
 - Open `index.html` in your web browser
-- No build process required - it's a simple HTML/CSS/JS application
+- No build process required
 
 ## Usage
 
-1. Set your desired work and rest durations in the settings popup
-2. Click the orange start button to begin the timer
-3. Use the quick adjust buttons to add or remove time
-4. The timer will automatically switch between work and rest periods
-5. Sound notifications will play when the timer completes
+1. Set your desired timer duration
+2. Click start to begin the timer
+3. Use quick adjust buttons to modify time
+4. Timer will notify you when complete
 
 ## Technologies Used
 
 - HTML5
-- CSS3 (with modern features like glassmorphism)
-- JavaScript (ES6+)
-- Web Audio API for sound generation
+- CSS3
+- JavaScript
+- Web Audio API
 
 ## License
 
-MIT License - feel free to use and modify as you wish!
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. 
+MIT License 

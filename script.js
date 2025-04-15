@@ -1,173 +1,156 @@
-const display = document.querySelector('.display');
-const startPauseBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
+// DOM Elements
+const display = document.getElementById('display');
+const startPauseBtn = document.getElementById('startPauseBtn');
 const resetBtn = document.getElementById('resetBtn');
-const minutesInput = document.getElementById('minutesInput');
-const secondsInput = document.getElementById('secondsInput');
-const modeIndicator = document.querySelector('.mode-indicator');
+const modeIndicator = document.getElementById('modeIndicator');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsPopup = document.getElementById('settingsPopup');
+const settingsCloseBtn = document.getElementById('settingsCloseBtn');
 
-// Initialize Audio Context
-let audioContext;
-// Initialize audio context on first user interaction
-document.addEventListener('click', () => {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-}, { once: true });
+// Quick adjust buttons
+const addTenBtn = document.getElementById('addTenBtn');
+const addThirtyBtn = document.getElementById('addThirtyBtn');
+const removeTenBtn = document.getElementById('removeTenBtn');
+const removeThirtyBtn = document.getElementById('removeThirtyBtn');
 
-const FOCUS_TIME = 25 * 60; // 25 minutes in seconds
-const REST_TIME = 5 * 60;  // 5 minutes in seconds
+// Settings inputs
+const workMinutesInput = document.getElementById('workMinutesInput');
+const workSecondsInput = document.getElementById('workSecondsInput');
+const restMinutesInput = document.getElementById('restMinutesInput');
+const restSecondsInput = document.getElementById('restSecondsInput');
 
-let timeLeft = FOCUS_TIME;
-let timerId = null;
+// Timer variables
+let timer;
+let timeLeft;
 let isRunning = false;
-let isFocusMode = true;
+let isWorkTime = true;
 
-// Request notification permission early
-if ("Notification" in window) {
-    Notification.requestPermission();
-}
+// Default durations (in seconds)
+let FOCUS_TIME = 25 * 60;
+let REST_TIME = 5 * 60;
 
-function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-function updateDisplay() {
-    display.textContent = formatTime(timeLeft);
-}
-
-function getTimeFromInputs() {
-    const minutes = parseInt(minutesInput.value) || 0;
-    const seconds = parseInt(secondsInput.value) || 0;
-    return (minutes * 60) + seconds;
-}
-
-function toggleMode() {
-    isFocusMode = !isFocusMode;
-    timeLeft = isFocusMode ? FOCUS_TIME : REST_TIME;
-    modeIndicator.textContent = isFocusMode ? 'Focus Time' : 'Rest Time';
-    minutesInput.value = isFocusMode ? '25' : '05';
-    secondsInput.value = '00';
-    updateDisplay();
-}
-
-function resetToDefault() {
-    stopTimer();
-    isFocusMode = true;
-    modeIndicator.textContent = 'Focus Time';
-    minutesInput.value = "25";
-    secondsInput.value = "00";
+// Initialize timer
+function initTimer() {
     timeLeft = FOCUS_TIME;
     updateDisplay();
 }
 
-function playNotificationSound() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    // Create oscillator
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    // Configure oscillator
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5 note
-    
-    // Configure gain (volume)
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-    
-    // Connect nodes
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // Play sound
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.5);
+// Update display
+function updateDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function playNotification() {
-    // Play notification sound
-    playNotificationSound();
-
-    // Show notification
-    if ("Notification" in window && Notification.permission === "granted") {
-        new Notification("Timer Complete!", {
-            body: isFocusMode ? "Time for a break!" : "Back to focus time!",
-            icon: "/favicon.ico"
-        });
-    }
-}
-
-function startTimer() {
-    if (!isRunning) {
-        // If timer wasn't running, get time from inputs
-        if (!timerId) {
-            timeLeft = getTimeFromInputs();
-        }
-        
-        isRunning = true;
-        startPauseBtn.textContent = 'Pause';
-        stopBtn.disabled = false;
-        minutesInput.disabled = true;
-        secondsInput.disabled = true;
-        
-        timerId = setInterval(() => {
-            timeLeft--;
-            updateDisplay();
-            
-            if (timeLeft <= 0) {
-                stopTimer();
-                playNotification();
-                toggleMode();
-                
-                // Optional: Auto-start the next session
-                // setTimeout(startTimer, 1000);
-            }
-        }, 1000);
-    } else {
-        pauseTimer();
-    }
-}
-
-function pauseTimer() {
+// Start/Pause timer
+function toggleTimer() {
     if (isRunning) {
-        clearInterval(timerId);
+        clearInterval(timer);
         isRunning = false;
         startPauseBtn.textContent = 'Start';
+    } else {
+        timer = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateDisplay();
+            } else {
+                playNotificationSound();
+                if (isWorkTime) {
+                    isWorkTime = false;
+                    timeLeft = REST_TIME;
+                    modeIndicator.textContent = 'Rest Time';
+                } else {
+                    isWorkTime = true;
+                    timeLeft = FOCUS_TIME;
+                    modeIndicator.textContent = 'Focus Time';
+                }
+                updateDisplay();
+            }
+        }, 1000);
+        isRunning = true;
+        startPauseBtn.textContent = 'Pause';
     }
 }
 
-function stopTimer() {
-    clearInterval(timerId);
+// Reset timer
+function resetTimer() {
+    clearInterval(timer);
     isRunning = false;
-    timerId = null;
     startPauseBtn.textContent = 'Start';
-    stopBtn.disabled = true;
-    minutesInput.disabled = false;
-    secondsInput.disabled = false;
-    timeLeft = getTimeFromInputs();
+    isWorkTime = true;
+    modeIndicator.textContent = 'Focus Time';
+    timeLeft = FOCUS_TIME;
     updateDisplay();
 }
 
+// Add time
+function addTime(seconds) {
+    if (!isRunning) {
+        timeLeft += seconds;
+        updateDisplay();
+    }
+}
+
+// Remove time
+function removeTime(seconds) {
+    if (!isRunning && timeLeft > seconds) {
+        timeLeft -= seconds;
+        updateDisplay();
+    }
+}
+
+// Play notification sound
+function playNotificationSound() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    
+    oscillator.start();
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    oscillator.stop(audioContext.currentTime + 0.5);
+}
+
+// Settings functions
+function openSettings() {
+    settingsPopup.classList.add('show');
+}
+
+function closeSettings() {
+    settingsPopup.classList.remove('show');
+    // Update timer durations
+    FOCUS_TIME = (parseInt(workMinutesInput.value) * 60) + parseInt(workSecondsInput.value);
+    REST_TIME = (parseInt(restMinutesInput.value) * 60) + parseInt(restSecondsInput.value);
+    resetTimer();
+}
+
 // Event Listeners
-startPauseBtn.addEventListener('click', startTimer);
-stopBtn.addEventListener('click', stopTimer);
-resetBtn.addEventListener('click', resetToDefault);
+startPauseBtn.addEventListener('click', toggleTimer);
+resetBtn.addEventListener('click', resetTimer);
+settingsBtn.addEventListener('click', openSettings);
+settingsCloseBtn.addEventListener('click', closeSettings);
+
+// Quick adjust buttons
+addTenBtn.addEventListener('click', () => addTime(600));
+addThirtyBtn.addEventListener('click', () => addTime(1800));
+removeTenBtn.addEventListener('click', () => removeTime(600));
+removeThirtyBtn.addEventListener('click', () => removeTime(1800));
 
 // Input validation
-minutesInput.addEventListener('input', function() {
-    if (this.value < 0) this.value = 0;
-    if (this.value > 59) this.value = 59;
+[workMinutesInput, workSecondsInput, restMinutesInput, restSecondsInput].forEach(input => {
+    input.addEventListener('change', () => {
+        let value = parseInt(input.value);
+        if (isNaN(value) || value < 0) value = 0;
+        if (value > 59) value = 59;
+        input.value = value;
+    });
 });
 
-secondsInput.addEventListener('input', function() {
-    if (this.value < 0) this.value = 0;
-    if (this.value > 59) this.value = 59;
-});
-
-// Initialize display
-updateDisplay();
+// Initialize
+initTimer();

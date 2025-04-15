@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Timer</title>
+    <title>C2C Focus Timer</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <!-- Decorative pigs -->
@@ -34,21 +35,58 @@
     </div>
     
     <div class="timer-container">
-        <div class="mode-indicator">Focus Time</div>
-        <div class="time-input">
-            <div class="input-group">
-                <input type="number" id="minutesInput" min="0" max="59" value="25">
-                <span>:</span>
-                <input type="number" id="secondsInput" min="0" max="59" value="00">
+        <button class="settings-button" id="settingsBtn">
+            <span class="material-icons">settings</span>
+        </button>
+        
+        <div class="mode-indicator" id="modeIndicator">Focus Time</div>
+        <div class="display" id="display">25:00</div>
+        
+        <div class="quick-adjust-container">
+            <div class="quick-adjust-label">Quick Adjust</div>
+            <div class="buttons">
+                <button id="addTenBtn">+10</button>
+                <button id="addThirtyBtn">+30</button>
+            </div>
+            <div class="buttons">
+                <button id="removeTenBtn">-10</button>
+                <button id="removeThirtyBtn">-30</button>
             </div>
         </div>
-        <div class="display">25:00</div>
+        
         <div class="buttons">
-            <button id="startBtn">Start</button>
-            <button id="stopBtn" disabled>Stop</button>
+            <button id="startPauseBtn">Start</button>
             <button id="resetBtn">Reset</button>
         </div>
     </div>
+
+    <!-- Settings Popup -->
+    <div class="popup" id="settingsPopup">
+        <div class="popup-content">
+            <h2>Timer Settings</h2>
+            
+            <div class="time-input">
+                <label>Work Duration</label>
+                <div class="input-group">
+                    <input type="number" id="workMinutesInput" min="0" max="59" value="25">
+                    <span>:</span>
+                    <input type="number" id="workSecondsInput" min="0" max="59" value="0">
+                </div>
+            </div>
+            
+            <div class="time-input">
+                <label>Rest Duration</label>
+                <div class="input-group">
+                    <input type="number" id="restMinutesInput" min="0" max="59" value="5">
+                    <span>:</span>
+                    <input type="number" id="restSecondsInput" min="0" max="59" value="0">
+                </div>
+            </div>
+            
+            <button id="settingsCloseBtn">Save & Close</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
